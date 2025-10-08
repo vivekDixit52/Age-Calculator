@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Age Calculator | CodeAlpha</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      transition: background 0.5s;
+    }
+    body.dark {
+      background: linear-gradient(135deg, #232526, #414345);
+      color: #fff;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 650px;
+      width: 95%;
+      color: #333;
+      animation: fadeIn 1s ease;
+    }
+    body.dark .container {
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 32px;
+    }
+    label {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    input[type="date"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    button {
+      width: 48%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+      color: #333;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      margin: 5px;
+    }
+    button:hover {
+      background: #222;
+      color: #fff;
+    }
+    .toggle-btn {
+      background: #444;
+      color: #fff;
+    }
+    .toggle-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+    .error {
+      margin-top: 10px;
+      color: #ffcccc;
+      font-size: 14px;
+    }
+    .result-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      text-align: left;
+      display: none;
+    }
+    .result-box p {
+      font-size: 16px;
+      margin: 8px 0;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #ffeb3b;
+    }
+    body.dark .highlight {
+      color: #ff9800;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌟 Advanced Age Calculator 🌟</h1>
+    <label for="dob">Enter Your Date of Birth:</label>
+    <input type="date" id="dob">
+    <div>
+      <button onclick="calculateAge()">Calculate Age</button>
+      <button class="toggle-btn" onclick="toggleTheme()">🌙 Toggle Mode</button>
+    </div>
+    <div class="error" id="error"></div>
+
+    <div class="result-box" id="resultBox">
+      <p id="age"></p>
+      <p id="dobDay"></p>
+      <p id="nextBirthday"></p>
+      <p id="countdown"></p>
+      <p id="liveAge"></p>
+    </div>
+  </div>
+
+  <script>
+    let ageInterval, countdownInterval;
+    
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    function calculateAge() {
+      const dobInput = document.getElementById("dob").value;
+      const error = document.getElementById("error");
+      const resultBox = document.getElementById("resultBox");
+      const ageText = document.getElementById("age");
+      const dobDay = document.getElementById("dobDay");
+      const nextBirthday = document.getElementById("nextBirthday");
+      const countdown = document.getElementById("countdown");
+      const liveAge = document.getElementById("liveAge");
+
+      error.textContent = "";
+      resultBox.style.display = "none";
+      clearInterval(ageInterval);
+      clearInterval(countdownInterval);
+
+      if (!dobInput) {
+        error.textContent = "⚠️ Please select your date of birth.";
+        return;
+      }
+
+      const dob = new Date(dobInput);
+      const today = new Date();
+
+      if (dob > today) {
+        error.textContent = "⚠️ Date of birth cannot be in the future.";
+        return;
+      }
+
+      // Normal Age
+      let years = today.getFullYear() - dob.getFullYear();
+      let months = today.getMonth() - dob.getMonth();
+      let days = today.getDate() - dob.getDate();
+
+      if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      ageText.innerHTML = `🎉 You are <span class="highlight">${years} Years</span>, <span class="highlight">${months} Months</span>, and <span class="highlight">${days} Days</span> old.`;
+
+      // Day of birth
+      const daysOfWeek = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      dobDay.textContent = `📅 You were born on a ${daysOfWeek[dob.getDay()]}.`;
+
+      // Next Birthday Countdown
+      let nextBday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+      if (nextBday < today) {
+        nextBday.setFullYear(today.getFullYear() + 1);
+      }
+      nextBirthday.textContent = `🎂 Your next birthday is on ${nextBday.toDateString()}`;
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = nextBday - now;
+
+        const daysLeft = Math.floor(diff / (1000*60*60*24));
+        const hours = Math.floor((diff / (1000*60*60)) % 24);
+        const minutes = Math.floor((diff / (1000*60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        countdown.textContent = `⏳ Time left: ${daysLeft}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+
+      // Live Age
+      function updateLiveAge() {
+        const now = new Date();
+        const diff = now - dob;
+
+        const yearsExact = Math.floor(diff / (1000*60*60*24*365.25));
+        const daysExact = Math.floor(diff / (1000*60*60*24));
+        const hours = Math.floor((diff / (1000*60*60)) % 24);
+        const minutes = Math.floor((diff / (1000*60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        liveAge.textContent = `⌛ Exact Age: ${yearsExact} Years, ${daysExact} Days, ${hours}h ${minutes}m ${seconds}s`;
+      }
+      updateLiveAge();
+      ageInterval = setInterval(updateLiveAge, 1000);
+
+      resultBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>
