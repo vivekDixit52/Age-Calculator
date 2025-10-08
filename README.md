@@ -34,7 +34,7 @@ An easy-to-use web application that helps users calculate their exact age in yea
 
 ## 📸 Screenshot
 
-![App Screenshot](./Screenshot%201.png)
+![App Screenshot]()
 ![App Screenshot](./Screenshot%202.png)
 *(Optional – You can add a screenshot of your app here)*  
 ```
