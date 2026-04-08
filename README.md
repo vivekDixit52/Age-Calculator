@@ -74,5 +74,5 @@ age-calculator/
 ## 👨‍💻 Developed By
 
 **Vivek Dixit**  
-📧 Email: [your-email@example.com]  
+📧 Email: [vivekpandit746@gmail.com]  
 🏫 GLA University, Mathura  
